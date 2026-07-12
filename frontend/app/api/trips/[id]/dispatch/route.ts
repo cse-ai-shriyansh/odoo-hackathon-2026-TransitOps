@@ -7,7 +7,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   try {
     const session = await requireSession(request);
     const { id } = await params;
-    return successResponse(dispatchTripService(session.user.role, id));
+    const result = await dispatchTripService(session.user.role, id);
+    return successResponse(result);
   } catch (error) {
     return handleApiError(error);
   }

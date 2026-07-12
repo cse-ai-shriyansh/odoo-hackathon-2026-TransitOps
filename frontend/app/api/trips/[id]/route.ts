@@ -8,7 +8,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const session = await requireSession(request);
     const { id } = await params;
     const body = await request.json();
-    return successResponse(updateTripService(session.user.role, id, body));
+    const result = await updateTripService(session.user.role, id, body);
+    return successResponse(result);
   } catch (error) {
     return handleApiError(error);
   }
@@ -18,7 +19,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   try {
     const session = await requireSession(request);
     const { id } = await params;
-    return successResponse(deleteTripService(session.user.role, id));
+    const result = await deleteTripService(session.user.role, id);
+    return successResponse(result);
   } catch (error) {
     return handleApiError(error);
   }

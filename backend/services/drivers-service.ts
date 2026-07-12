@@ -56,7 +56,7 @@ export async function createDriverService(role: UserRole, body: unknown): Promis
   return record;
 }
 
-export function updateDriverService(role: UserRole, id: string, body: unknown): Driver {
+export async function updateDriverService(role: UserRole, id: string, body: unknown): Promise<Driver> {
   requireAllowed(role);
   const parsed = driverCreateSchema.partial().safeParse(body);
 
@@ -87,10 +87,17 @@ export function updateDriverService(role: UserRole, id: string, body: unknown): 
 
   drivers[index] = updated;
   repositories.saveDrivers(drivers);
+  try {
+    const { updateDriverInSupabase } = await import("../repositories");
+    await updateDriverInSupabase(updated);
+  } catch (err) {
+    console.error("Driver update persistence failed:", err);
+  }
+
   return updated;
 }
 
-export function deleteDriverService(role: UserRole, id: string): { success: true } {
+export async function deleteDriverService(role: UserRole, id: string): Promise<{ success: true }> {
   if (role !== "admin") {
     throw forbidden("Insufficient permissions");
   }
@@ -109,5 +116,12 @@ export function deleteDriverService(role: UserRole, id: string): { success: true
   }
 
   repositories.saveDrivers(nextDrivers);
+  try {
+    const { deleteDriverFromSupabase } = await import("../repositories");
+    await deleteDriverFromSupabase(id);
+  } catch (err) {
+    console.error("Driver delete persistence failed:", err);
+  }
+
   return { success: true };
 }

@@ -46,7 +46,7 @@ export async function createExpenseService(role: UserRole, body: unknown): Promi
   return record;
 }
 
-export function updateExpenseService(role: UserRole, id: string, body: unknown): Expense {
+export async function updateExpenseService(role: UserRole, id: string, body: unknown): Promise<Expense> {
   requireAllowed(role);
   const parsed = expenseCreateSchema.partial().safeParse(body);
 
@@ -68,10 +68,18 @@ export function updateExpenseService(role: UserRole, id: string, body: unknown):
     vehicleId: parsed.data.vehicleId ?? records[index].vehicleId ?? null
   };
   repositories.saveExpenses(records);
+
+  try {
+    const { updateExpenseInSupabase } = await import("../repositories");
+    await updateExpenseInSupabase(records[index]);
+  } catch (err) {
+    console.error("Expense update persistence failed:", err);
+  }
+
   return records[index];
 }
 
-export function deleteExpenseService(role: UserRole, id: string): { success: true } {
+export async function deleteExpenseService(role: UserRole, id: string): Promise<{ success: true }> {
   if (role !== "admin") {
     throw forbidden("Insufficient permissions");
   }
@@ -84,5 +92,13 @@ export function deleteExpenseService(role: UserRole, id: string): { success: tru
   }
 
   repositories.saveExpenses(nextRecords);
+
+  try {
+    const { deleteExpenseFromSupabase } = await import("../repositories");
+    await deleteExpenseFromSupabase(id);
+  } catch (err) {
+    console.error("Expense delete persistence failed:", err);
+  }
+
   return { success: true };
 }

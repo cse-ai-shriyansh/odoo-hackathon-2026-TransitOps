@@ -7,7 +7,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   try {
     const session = await requireSession(request);
     const { id } = await params;
-    return successResponse(completeMaintenanceService(session.user.role, id));
+    const result = await completeMaintenanceService(session.user.role, id);
+    return successResponse(result);
   } catch (error) {
     return handleApiError(error);
   }

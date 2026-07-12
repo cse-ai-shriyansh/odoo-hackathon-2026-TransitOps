@@ -48,3 +48,62 @@ export async function createFuelLogService(role: UserRole, body: unknown): Promi
 
   return record;
 }
+
+export async function updateFuelLogService(role: UserRole, id: string, body: unknown): Promise<FuelLog> {
+  requireAllowed(role);
+  const parsed = fuelCreateSchema.partial().safeParse(body);
+
+  if (!parsed.success) {
+    throw validationError("Validation failed", parsed.error.flatten().fieldErrors as Record<string, string>);
+  }
+
+  const records = repositories.listFuelLogs();
+  const index = records.findIndex((r) => r.id === id);
+
+  if (index < 0) {
+    throw notFound("Fuel log not found.");
+  }
+
+  const updated: FuelLog = {
+    ...records[index],
+    ...parsed.data
+  } as FuelLog;
+
+  updated.totalCost = Math.round((parsed.data.liters ?? updated.liters) * (parsed.data.unitPrice ?? updated.unitPrice));
+
+  records[index] = updated;
+  repositories.saveFuelLogs(records);
+
+  try {
+    const { updateFuelLogInSupabase } = await import("../repositories");
+    await updateFuelLogInSupabase(updated);
+  } catch (err) {
+    console.error("Fuel log update persistence failed:", err);
+  }
+
+  return updated;
+}
+
+export async function deleteFuelLogService(role: UserRole, id: string): Promise<{ success: true }> {
+  if (role !== "admin" && role !== "fleet_manager") {
+    throw forbidden("Insufficient permissions");
+  }
+
+  const records = repositories.listFuelLogs();
+  const nextRecords = records.filter((r) => r.id !== id);
+
+  if (nextRecords.length === records.length) {
+    throw notFound("Fuel log not found.");
+  }
+
+  repositories.saveFuelLogs(nextRecords);
+
+  try {
+    const { deleteFuelLogFromSupabase } = await import("../repositories");
+    await deleteFuelLogFromSupabase(id);
+  } catch (err) {
+    console.error("Fuel log delete persistence failed:", err);
+  }
+
+  return { success: true };
+}

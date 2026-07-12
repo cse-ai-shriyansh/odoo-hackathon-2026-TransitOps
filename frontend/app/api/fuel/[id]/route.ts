@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteMaintenanceService, updateMaintenanceService } from "@backend/services/maintenance-service";
+import { deleteFuelLogService, updateFuelLogService } from "@backend/services/fuel-service";
 import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
 
@@ -8,7 +8,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const session = await requireSession(request);
     const { id } = await params;
     const body = await request.json();
-    const result = await updateMaintenanceService(session.user.role, id, body);
+    const result = await updateFuelLogService(session.user.role, id, body);
     return successResponse(result);
   } catch (error) {
     return handleApiError(error);
@@ -19,7 +19,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
   try {
     const session = await requireSession(request);
     const { id } = await params;
-    const result = await deleteMaintenanceService(session.user.role, id);
+    const result = await deleteFuelLogService(session.user.role, id);
     return successResponse(result);
   } catch (error) {
     return handleApiError(error);

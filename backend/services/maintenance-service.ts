@@ -52,7 +52,7 @@ export async function createMaintenanceService(role: UserRole, body: unknown): P
   return record;
 }
 
-export function updateMaintenanceService(role: UserRole, id: string, body: unknown): MaintenanceRecord {
+export async function updateMaintenanceService(role: UserRole, id: string, body: unknown): Promise<MaintenanceRecord> {
   requireAllowed(role);
   const parsed = maintenanceCreateSchema.partial().safeParse(body);
 
@@ -74,10 +74,17 @@ export function updateMaintenanceService(role: UserRole, id: string, body: unkno
   };
   records[index] = updated;
   repositories.saveMaintenance(records);
+  try {
+    const { updateMaintenanceInSupabase } = await import("../repositories");
+    await updateMaintenanceInSupabase(updated);
+  } catch (err) {
+    console.error("Maintenance update persistence failed:", err);
+  }
+
   return updated;
 }
 
-export function completeMaintenanceService(role: UserRole, id: string): MaintenanceRecord {
+export async function completeMaintenanceService(role: UserRole, id: string): Promise<MaintenanceRecord> {
   requireAllowed(role);
 
   const records = repositories.listMaintenance();
@@ -99,10 +106,20 @@ export function completeMaintenanceService(role: UserRole, id: string): Maintena
     repositories.saveVehicles(vehicles);
   }
 
+  try {
+    const { updateMaintenanceInSupabase, updateVehicleInSupabase } = await import("../repositories");
+    const actions: Promise<void>[] = [];
+    actions.push(updateMaintenanceInSupabase(records[index]));
+    if (vehicleIndex >= 0) actions.push(updateVehicleInSupabase(vehicles[vehicleIndex]));
+    await Promise.all(actions);
+  } catch (err) {
+    console.error("Complete maintenance persistence failed:", err);
+  }
+
   return records[index];
 }
 
-export function deleteMaintenanceService(role: UserRole, id: string): { success: true } {
+export async function deleteMaintenanceService(role: UserRole, id: string): Promise<{ success: true }> {
   if (role !== "admin") {
     throw forbidden("Insufficient permissions");
   }
@@ -115,5 +132,12 @@ export function deleteMaintenanceService(role: UserRole, id: string): { success:
   }
 
   repositories.saveMaintenance(nextRecords);
+  try {
+    const { deleteMaintenanceFromSupabase } = await import("../repositories");
+    await deleteMaintenanceFromSupabase(id);
+  } catch (err) {
+    console.error("Maintenance delete persistence failed:", err);
+  }
+
   return { success: true };
 }

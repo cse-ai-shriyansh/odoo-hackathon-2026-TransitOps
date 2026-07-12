@@ -346,6 +346,133 @@ export async function persistExpenseToSupabase(expense: Expense, createdBy?: str
   await client.from("expenses").insert(row).throwOnError();
 }
 
+export async function updateDriverInSupabase(driver: Driver): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    full_name: driver.name,
+    phone: driver.phone,
+    email: driver.email,
+    license_number: driver.licenseNumber,
+    license_expiry: driver.licenseExpiry.slice(0, 10),
+    status: driver.status === "suspended" ? "suspended" : "active",
+    assigned_vehicle_id: driver.assignedVehicleId ?? null
+  };
+
+  await client.from("drivers").update(row).eq("id", driver.id).throwOnError();
+}
+
+export async function deleteDriverFromSupabase(driverId: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("drivers").delete().eq("id", driverId).throwOnError();
+}
+
+export async function updateTripInSupabase(trip: Trip): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    trip_number: trip.reference,
+    vehicle_id: trip.vehicleId ?? null,
+    driver_id: trip.driverId ?? null,
+    origin: trip.origin,
+    destination: trip.destination,
+    scheduled_departure: trip.plannedDeparture,
+    scheduled_arrival: trip.plannedArrival,
+    estimated_distance_km: trip.cargoWeightKg,
+    status: trip.status === "completed" ? "completed" : trip.status === "active" ? "dispatched" : "scheduled",
+    remarks: trip.notes
+  };
+
+  await client.from("trips").update(row).eq("id", trip.id).throwOnError();
+}
+
+export async function deleteTripFromSupabase(tripId: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("trips").delete().eq("id", tripId).throwOnError();
+}
+
+export async function updateMaintenanceInSupabase(record: MaintenanceRecord): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    vehicle_id: record.vehicleId,
+    maintenance_type: record.type,
+    description: record.notes,
+    maintenance_date: record.scheduledDate.slice(0, 10),
+    next_due_date: record.scheduledDate.slice(0, 10),
+    cost: record.cost,
+    service_provider: record.vendor,
+    status: record.status,
+    completed_date: record.completedDate ?? null
+  };
+
+  await client.from("maintenance_logs").update(row).eq("id", record.id).throwOnError();
+}
+
+export async function deleteMaintenanceFromSupabase(recordId: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("maintenance_logs").delete().eq("id", recordId).throwOnError();
+}
+
+export async function updateFuelLogInSupabase(log: FuelLog): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    vehicle_id: log.vehicleId,
+    driver_id: log.driverId,
+    fuel_date: log.refuelDate,
+    fuel_station: log.station,
+    quantity_liters: log.liters,
+    price_per_liter: log.unitPrice,
+    odometer_reading_km: log.odometerKm,
+    total_cost: log.totalCost,
+    status: log.status
+  };
+
+  await client.from("fuel_logs").update(row).eq("id", log.id).throwOnError();
+}
+
+export async function deleteFuelLogFromSupabase(logId: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("fuel_logs").delete().eq("id", logId).throwOnError();
+}
+
+export async function updateExpenseInSupabase(expense: Expense): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    vehicle_id: expense.vehicleId ?? null,
+    trip_id: expense.tripId ?? null,
+    expense_date: expense.date.slice(0, 10),
+    category: expense.category,
+    amount: expense.amount,
+    description: expense.description,
+    status: expense.status
+  };
+
+  await client.from("expenses").update(row).eq("id", expense.id).throwOnError();
+}
+
+export async function deleteExpenseFromSupabase(expenseId: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("expenses").delete().eq("id", expenseId).throwOnError();
+}
+
 async function seedSupabaseFromMockData(client: NonNullable<ReturnType<typeof getSupabaseAdminClient>>) {
   const { data: existingProfiles } = await client.from("profiles").select("id").limit(1);
 

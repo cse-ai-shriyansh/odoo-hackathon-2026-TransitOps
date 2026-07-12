@@ -96,7 +96,7 @@ export async function createTripService(role: UserRole, body: unknown): Promise<
   return record;
 }
 
-export function updateTripService(role: UserRole, id: string, body: unknown): Trip {
+export async function updateTripService(role: UserRole, id: string, body: unknown): Promise<Trip> {
   requireAllowed(role);
   const parsed = tripCreateSchema.partial().safeParse(body);
 
@@ -119,10 +119,17 @@ export function updateTripService(role: UserRole, id: string, body: unknown): Tr
 
   trips[index] = updated;
   repositories.saveTrips(trips);
+  try {
+    const { updateTripInSupabase } = await import("../repositories");
+    await updateTripInSupabase(updated);
+  } catch (err) {
+    console.error("Trip update persistence failed:", err);
+  }
+
   return updated;
 }
 
-export function dispatchTripService(role: UserRole, id: string): Trip {
+export async function dispatchTripService(role: UserRole, id: string): Promise<Trip> {
   requireAllowed(role);
   const trips = repositories.listTrips();
   const index = trips.findIndex((trip) => trip.id === id);
@@ -146,10 +153,22 @@ export function dispatchTripService(role: UserRole, id: string): Trip {
   repositories.saveVehicles(vehicles);
   repositories.saveDrivers(drivers);
   repositories.saveTrips(trips);
+
+  try {
+    const { updateVehicleInSupabase, updateDriverInSupabase, updateTripInSupabase } = await import("../repositories");
+    await Promise.all([
+      updateVehicleInSupabase(vehicles[vehicleIndex]),
+      updateDriverInSupabase(drivers[driverIndex]),
+      updateTripInSupabase(trips[index])
+    ]);
+  } catch (err) {
+    console.error("Dispatch persistence failed:", err);
+  }
+
   return trips[index];
 }
 
-export function completeTripService(role: UserRole, id: string, body: unknown): Trip {
+export async function completeTripService(role: UserRole, id: string, body: unknown): Promise<Trip> {
   requireAllowed(role);
   const parsed = tripActionSchema.safeParse(body ?? {});
 
@@ -181,10 +200,21 @@ export function completeTripService(role: UserRole, id: string, body: unknown): 
   repositories.saveVehicles(vehicles);
   repositories.saveDrivers(drivers);
   repositories.saveTrips(trips);
+  try {
+    const { updateVehicleInSupabase, updateDriverInSupabase, updateTripInSupabase } = await import("../repositories");
+    await Promise.all([
+      updateVehicleInSupabase(vehicles[vehicleIndex]),
+      updateDriverInSupabase(drivers[driverIndex]),
+      updateTripInSupabase(trips[index])
+    ]);
+  } catch (err) {
+    console.error("Complete trip persistence failed:", err);
+  }
+
   return trips[index];
 }
 
-export function cancelTripService(role: UserRole, id: string): Trip {
+export async function cancelTripService(role: UserRole, id: string): Promise<Trip> {
   requireAllowed(role);
   const trips = repositories.listTrips();
   const index = trips.findIndex((trip) => trip.id === id);
@@ -212,10 +242,23 @@ export function cancelTripService(role: UserRole, id: string): Trip {
   repositories.saveVehicles(vehicles);
   repositories.saveDrivers(drivers);
   repositories.saveTrips(trips);
+  try {
+    const { updateVehicleInSupabase, updateDriverInSupabase, updateTripInSupabase } = await import("../repositories");
+    const actions: Promise<void>[] = [];
+
+    if (vehicleIndex >= 0) actions.push(updateVehicleInSupabase(vehicles[vehicleIndex]));
+    if (driverIndex >= 0) actions.push(updateDriverInSupabase(drivers[driverIndex]));
+    actions.push(updateTripInSupabase(trips[index]));
+
+    await Promise.all(actions);
+  } catch (err) {
+    console.error("Cancel trip persistence failed:", err);
+  }
+
   return trips[index];
 }
 
-export function deleteTripService(role: UserRole, id: string): { success: true } {
+export async function deleteTripService(role: UserRole, id: string): Promise<{ success: true }> {
   if (role !== "admin" && role !== "fleet_manager") {
     throw forbidden("Insufficient permissions");
   }
@@ -228,5 +271,12 @@ export function deleteTripService(role: UserRole, id: string): { success: true }
   }
 
   repositories.saveTrips(nextTrips);
+  try {
+    const { deleteTripFromSupabase } = await import("../repositories");
+    await deleteTripFromSupabase(id);
+  } catch (err) {
+    console.error("Trip delete persistence failed:", err);
+  }
+
   return { success: true };
 }
