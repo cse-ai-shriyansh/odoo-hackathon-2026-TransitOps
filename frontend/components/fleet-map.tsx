@@ -10,7 +10,7 @@ import { formatDateTime } from "@/utils/format";
 
 const markerIcon = divIcon({
   className: "",
-  html: '<div style="width:18px;height:18px;border-radius:9999px;background:#2563eb;border:3px solid white;box-shadow:0 4px 14px rgba(37,99,235,0.45)"></div>',
+  html: '<div style="width:18px;height:18px;border-radius:9999px;background:#111111;border:3px solid white;box-shadow:0 4px 14px rgba(0,0,0,0.18)"></div>',
   iconSize: [18, 18],
   iconAnchor: [9, 9]
 });

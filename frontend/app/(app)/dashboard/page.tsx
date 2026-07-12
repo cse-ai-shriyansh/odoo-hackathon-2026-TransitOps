@@ -1,12 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { BarChart3, Fuel, MapPinned, PackageSearch, TriangleAlert, Truck, UserRound, Wrench } from "lucide-react";
 import { getDashboard } from "@/lib/api/dashboard";
-import { FleetMap } from "@/components/fleet-map";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/utils/format";
+
+const FleetMap = dynamic(() => import("@/components/fleet-map").then((module) => module.FleetMap), {
+  ssr: false
+});
 
 function KpiCard({ title, value, icon }: { title: string; value: string | number; icon: React.ReactNode }): JSX.Element {
   return (
@@ -16,7 +20,7 @@ function KpiCard({ title, value, icon }: { title: string; value: string | number
           <p className="text-sm text-muted-foreground">{title}</p>
           <p className="mt-2 text-3xl font-semibold tracking-tight">{value}</p>
         </div>
-        <div className="rounded-2xl bg-primary/10 p-3 text-primary">{icon}</div>
+        <div className="rounded-2xl border border-border bg-background p-3 text-foreground">{icon}</div>
       </CardContent>
     </Card>
   );
@@ -46,7 +50,7 @@ function SimpleBarChart({
               <span className="text-muted-foreground">{point.value}</span>
             </div>
             <div className="h-2 rounded-full bg-muted">
-              <div className="h-2 rounded-full bg-primary" style={{ width: `${(point.value / maxValue) * 100}%` }} />
+              <div className="h-2 rounded-full bg-foreground" style={{ width: `${(point.value / maxValue) * 100}%` }} />
             </div>
           </div>
         ))}
@@ -99,7 +103,7 @@ export default function DashboardPage(): JSX.Element {
         <CardContent>
           <div className="grid gap-4 md:grid-cols-5">
             {data.expenseBreakdown.map((item) => (
-              <div key={item.label} className="rounded-2xl bg-muted p-4">
+              <div key={item.label} className="rounded-2xl border border-border bg-muted p-4">
                 <p className="text-sm text-muted-foreground">{item.label}</p>
                 <p className="mt-2 text-2xl font-semibold">{formatCurrency(item.value)}</p>
               </div>

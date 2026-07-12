@@ -17,10 +17,10 @@ export function AppShell({ children }: { children: React.ReactNode }): JSX.Eleme
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(59,130,246,0.12),transparent_30%),radial-gradient(circle_at_top_right,rgba(16,185,129,0.10),transparent_25%),linear-gradient(to_bottom,hsl(var(--background)),hsl(var(--background)))] text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="mx-auto flex min-h-screen w-full max-w-[1600px] gap-6 p-4 lg:p-6">
         <aside className="hidden w-72 shrink-0 lg:flex lg:flex-col">
-          <Card className="flex h-full flex-col justify-between border-border/80 bg-background/80 backdrop-blur">
+          <Card className="flex h-full flex-col justify-between border-border/80 bg-background/95 backdrop-blur">
             <div className="p-6">
               <div className="mb-6 flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-soft">
@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }): JSX.Eleme
         </aside>
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
-          <header className="sticky top-4 z-30 rounded-2xl border border-border/80 bg-background/80 px-4 py-3 shadow-soft backdrop-blur">
+          <header className="sticky top-4 z-30 rounded-2xl border border-border/80 bg-background/95 px-4 py-3 shadow-soft backdrop-blur">
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-3 lg:hidden">
                 <Button variant="ghost" className="h-10 w-10 p-0">
