@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createTripService, listTripsService } from "@backend/services/trips-service";
 import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
+import { initializeRepositoriesFromSupabase } from "@backend/repositories";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
+    await initializeRepositoriesFromSupabase();
     return successResponse(listTripsService(session.user.role));
   } catch (error) {
     return handleApiError(error);

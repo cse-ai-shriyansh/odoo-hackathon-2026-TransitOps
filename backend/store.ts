@@ -18,6 +18,7 @@ export interface BackendStore {
   fuelLogs: FuelLog[];
   expenses: Expense[];
   dashboard: DashboardPayload;
+  hydratedFromSupabase: boolean;
 }
 
 function clone<T>(value: T): T {
@@ -32,5 +33,6 @@ export const backendStore: BackendStore = {
   maintenance: clone(seededMaintenance),
   fuelLogs: clone(seededFuelLogs),
   expenses: clone(seededExpenses),
-  dashboard: clone(dashboardPayload)
+  dashboard: clone(dashboardPayload),
+  hydratedFromSupabase: false
 };

@@ -1,6 +1,6 @@
 import type { Vehicle } from "../../frontend/types/domain";
 import { conflict, forbidden, notFound, validationError } from "../errors";
-import { repositories } from "../repositories";
+import { persistVehicleToSupabase, repositories } from "../repositories";
 import { vehicleCreateSchema } from "../validation";
 import type { UserRole } from "../../frontend/types/domain";
 
@@ -25,7 +25,7 @@ export function listVehiclesService(role: UserRole): Vehicle[] {
   return repositories.listVehicles();
 }
 
-export function createVehicleService(role: UserRole, body: unknown): Vehicle {
+export async function createVehicleService(role: UserRole, body: unknown): Promise<Vehicle> {
   requireAllowed(role);
   const parsed = vehicleCreateSchema.safeParse(body);
 
@@ -43,6 +43,13 @@ export function createVehicleService(role: UserRole, body: unknown): Vehicle {
   };
   records.unshift(record);
   repositories.saveVehicles(records);
+
+  try {
+    await persistVehicleToSupabase(record);
+  } catch (error) {
+    console.error("Failed to persist vehicle to Supabase", error);
+  }
+
   return record;
 }
 
