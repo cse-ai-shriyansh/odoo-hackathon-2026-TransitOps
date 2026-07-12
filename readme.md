@@ -2,6 +2,8 @@
 
 Authors: [shriyansh upadhyay](https://github.com/cse-ai-shriyansh/), [T prashant](https://github.com/prashant847), [vaibhav sharma](https://github.com/vaibhav9526), [ayush kumar patel](https://github.com/Ayushkumarpatel-AKP)
 
+Architecture : [Architecture.md file](https://github.com/cse-ai-shriyansh/odoo-hackathon-2026-TransitOps/blob/main/ARCHITECTURE.md)
+
 TransitOps is a contract-first transport operations workspace built with Next.js. It brings the core fleet workflow into one governed interface for vehicles, drivers, trips, maintenance, fuel, expenses, dashboard insights, and reporting.
 
 ## Product USP
