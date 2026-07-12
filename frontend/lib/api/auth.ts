@@ -8,8 +8,16 @@ export interface LoginInput {
 }
 
 export async function getSession(): Promise<AuthSession | null> {
-  const response = await apiRequest<AuthSession>({ method: "GET", path: "/auth/session" });
-  return response.data;
+  try {
+    const response = await apiRequest<AuthSession>({ method: "GET", path: "/auth/session" });
+    return response.data;
+  } catch (error) {
+    if (error instanceof Error && "status" in error && (error as { status?: number }).status === 401) {
+      return null;
+    }
+
+    throw error;
+  }
 }
 
 export async function login(input: LoginInput): Promise<AuthSession> {
@@ -23,5 +31,6 @@ export async function login(input: LoginInput): Promise<AuthSession> {
 }
 
 export async function logout(): Promise<{ success: true }> {
-  return { success: true };
+  const response = await apiRequest<{ success: true }>({ method: "POST", path: "/auth/logout" });
+  return response.data;
 }
