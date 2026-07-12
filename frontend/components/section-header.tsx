@@ -11,6 +11,7 @@ export function SectionHeader({
   description: string;
   actionLabel?: string;
   onAction?: () => void;
+  actionDisabled?: boolean;
 }): JSX.Element {
   return (
     <Card className="border-border/80 bg-background/90">
@@ -19,7 +20,7 @@ export function SectionHeader({
           <CardTitle className="text-2xl">{title}</CardTitle>
           <CardDescription className="mt-1">{description}</CardDescription>
         </div>
-        {actionLabel && onAction ? <Button onClick={onAction}>{actionLabel}</Button> : null}
+        {actionLabel && onAction ? <Button onClick={onAction} disabled={Boolean((arguments[0] as any).actionDisabled)}>{actionLabel}</Button> : null}
       </div>
     </Card>
   );

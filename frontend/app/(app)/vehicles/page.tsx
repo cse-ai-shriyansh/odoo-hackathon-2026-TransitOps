@@ -47,6 +47,7 @@ export default function VehiclesPage(): JSX.Element {
   const [page, setPage] = useState(1);
   const [editing, setEditing] = useState<Vehicle | null>(null);
   const [removing, setRemoving] = useState<Vehicle | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<VehicleFormValues>({
     resolver: zodResolver(vehicleSchema),
@@ -77,6 +78,7 @@ export default function VehiclesPage(): JSX.Element {
       await queryClient.invalidateQueries({ queryKey: ["vehicles"] });
       setEditing(null);
       form.reset();
+      setIsDialogOpen(false);
     }
   });
 
@@ -105,6 +107,7 @@ export default function VehiclesPage(): JSX.Element {
 
   function openCreate(): void {
     setEditing(null);
+    setIsDialogOpen(true);
     form.reset({
       plateNumber: "",
       name: "",
@@ -123,12 +126,13 @@ export default function VehiclesPage(): JSX.Element {
 
   function openEdit(vehicle: Vehicle): void {
     setEditing(vehicle);
+    setIsDialogOpen(true);
     form.reset(vehicle);
   }
 
   return (
     <div className="space-y-6">
-      <SectionHeader title="Vehicles" description="Manage fleet records, operational status, and capacity constraints." actionLabel="Add vehicle" onAction={openCreate} />
+      <SectionHeader title="Vehicles" description="Manage fleet records, operational status, and capacity constraints." actionLabel="Add vehicle" onAction={openCreate} actionDisabled={mutation.isLoading} />
 
       <Card>
         <CardHeader>
@@ -211,10 +215,15 @@ export default function VehiclesPage(): JSX.Element {
         </CardContent>
       </Card>
 
-      <Dialog open={Boolean(editing)} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent onClose={() => setEditing(null)}>
+      <Dialog open={isDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setEditing(null);
+            setIsDialogOpen(false);
+          }
+        }}>
+        <DialogContent onClose={() => { setEditing(null); setIsDialogOpen(false); }}>
           <DialogHeader>
-            <DialogTitle>{editing ? "Edit vehicle" : "Add vehicle"}</DialogTitle>
+            <DialogTitle>{editing && editing.id ? "Edit vehicle" : "Add vehicle"}</DialogTitle>
           </DialogHeader>
           <form className="space-y-4 p-6 pt-0" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
             <div className="grid gap-4 md:grid-cols-2">
@@ -232,7 +241,7 @@ export default function VehiclesPage(): JSX.Element {
               <div className="space-y-2"><Label>ETA</Label><Input type="datetime-local" {...form.register("eta")} /></div>
             </div>
             <DialogFooter>
-              <Button variant="outline" type="button" onClick={() => setEditing(null)}>Cancel</Button>
+              <Button variant="outline" type="button" onClick={() => { setEditing(null); setIsDialogOpen(false); }}>Cancel</Button>
               <Button type="submit">Save</Button>
             </DialogFooter>
           </form>
