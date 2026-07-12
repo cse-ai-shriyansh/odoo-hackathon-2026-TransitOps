@@ -1,4 +1,4 @@
-import type { AuthSession, DashboardPayload, Driver, Expense, FuelLog, MaintenanceRecord, Trip, Vehicle } from "@/types/domain";
+import type { AuthSession, DashboardPayload, Driver, Expense, FuelLog, MaintenanceRecord, Trip, Vehicle } from "../frontend/types/domain";
 import {
   dashboardPayload,
   seededDrivers,
@@ -7,7 +7,7 @@ import {
   seededMaintenance,
   seededTrips,
   seededVehicles
-} from "@/lib/mock/seed";
+} from "../frontend/lib/mock/seed";
 
 export interface BackendStore {
   session: AuthSession | null;

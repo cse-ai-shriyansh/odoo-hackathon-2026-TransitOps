@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getReportsService } from "@/backend/services/reports-service";
-import { successResponse } from "@/backend/response";
+import { getReportsService } from "@backend/services/reports-service";
+import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
-import { forbidden } from "@/backend/errors";
+import { forbidden } from "@backend/errors";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {

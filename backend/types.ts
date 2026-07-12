@@ -8,7 +8,7 @@ import type {
   Trip,
   Vehicle,
   UserRole
-} from "@/types/domain";
+} from "../frontend/types/domain";
 
 export type ResourceName = "vehicles" | "drivers" | "trips" | "maintenance" | "fuel" | "expenses";
 

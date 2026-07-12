@@ -1,10 +1,14 @@
-import type { AuthSession } from "@/types/domain";
+import type { AuthSession } from "../../frontend/types/domain";
 import { loginSchema } from "../validation";
 import { loginWithSupabase, logoutFromSupabase, readSessionFromRequest, serializeSessionCookie } from "../auth";
-import type { NextRequest } from "next/server";
 import { badRequest } from "../errors";
 
-export async function getSessionService(request: NextRequest): Promise<AuthSession | null> {
+interface RequestLike {
+  cookies: { get(name: string): { value?: string } | undefined };
+  headers: { get(name: string): string | null };
+}
+
+export async function getSessionService(request: RequestLike): Promise<AuthSession | null> {
   return readSessionFromRequest(request);
 }
 

@@ -1,13 +1,14 @@
 # Project Structure
 
 ## Top-Level Layout
-- `app/` - App Router entrypoints, layouts, and routes.
-- `components/` - Shared UI, shell, auth, map, and utility components.
-- `lib/` - API abstraction, mock services, constants, and query client.
+- `app/` - App Router entrypoints, layouts, protected shell routes, and API route handlers.
+- `components/` - Shared UI, shell, auth, theme, and fleet map components.
+- `lib/` - API abstraction, mock services, constants, and query-client setup.
+- `backend/` - Reusable backend services, validation, repositories, auth helpers, and response utilities.
 - `types/` - Shared TypeScript domain types.
 - `utils/` - Formatting and general helper utilities.
-- `docs/` - Contract and implementation documentation.
-- `Database/` - SQL seed files for the future backend.
+- `docs/` - API contract and implementation documentation.
+- `Database/` - SQL seed files for the future Supabase-backed persistence layer.
 
 ## App Routes
 - `/login` - authentication entry screen.

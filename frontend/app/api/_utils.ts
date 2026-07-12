@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import type { AuthSession } from "@/types/domain";
-import { readSessionFromRequest } from "@/backend/auth";
-import { BackendError } from "@/backend/errors";
-import { errorResponse } from "@/backend/response";
+import { readSessionFromRequest } from "@backend/auth";
+import { BackendError } from "@backend/errors";
+import { errorResponse } from "@backend/response";
 
 export async function requireSession(request: NextRequest): Promise<AuthSession> {
   const session = await readSessionFromRequest(request);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createMaintenanceService, listMaintenanceService } from "@/backend/services/maintenance-service";
-import { successResponse } from "@/backend/response";
+import { createMaintenanceService, listMaintenanceService } from "@backend/services/maintenance-service";
+import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {

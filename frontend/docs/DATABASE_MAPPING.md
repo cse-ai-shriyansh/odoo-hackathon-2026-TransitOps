@@ -19,3 +19,4 @@ This maps frontend surfaces to the SQL tables already present in `Database/`.
 - `profiles` holds user/session-oriented data for auth and role presentation.
 - Derived dashboard values are aggregated from the operational tables.
 - The mock layer currently synthesizes map points from vehicle locations and trip context.
+- The service layer normalizes SQL-backed data into the frontend contract without changing the UI.

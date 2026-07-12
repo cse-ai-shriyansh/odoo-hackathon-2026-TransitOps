@@ -1,4 +1,4 @@
-import type { Driver, Expense, FuelLog, MaintenanceRecord, Trip, Vehicle } from "@/types/domain";
+import type { Driver, Expense, FuelLog, MaintenanceRecord, Trip, Vehicle } from "../frontend/types/domain";
 import { backendStore } from "./store";
 
 function clone<T>(value: T): T {

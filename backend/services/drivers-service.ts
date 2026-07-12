@@ -1,8 +1,8 @@
-import type { Driver } from "@/types/domain";
+import type { Driver } from "../../frontend/types/domain";
 import { conflict, forbidden, notFound, validationError } from "../errors";
 import { repositories } from "../repositories";
 import { driverCreateSchema } from "../validation";
-import type { UserRole } from "@/types/domain";
+import type { UserRole } from "../../frontend/types/domain";
 
 const writeRoles: UserRole[] = ["admin", "fleet_manager", "dispatcher"];
 

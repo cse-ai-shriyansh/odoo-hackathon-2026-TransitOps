@@ -1,22 +1,31 @@
 import { cookies } from "next/headers";
-import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import type { AuthSession, UserRole } from "@/types/domain";
-import { seededAuthSession } from "@/lib/mock/seed";
+import type { AuthSession, UserRole } from "../frontend/types/domain";
+import { seededAuthSession } from "../frontend/lib/mock/seed";
 import { forbidden, unauthorized } from "./errors";
+
+interface RequestLike {
+  cookies: { get(name: string): { value?: string } | undefined };
+  headers: { get(name: string): string | null };
+}
 
 const SESSION_COOKIE = "transitops-session";
 
+function getEnv(name: string): string | null {
+  const value = process.env[name]?.trim();
+  return value ? value : null;
+}
+
 function getSupabaseUrl(): string | null {
-  return process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? null;
+  return getEnv("NEXT_PUBLIC_SUPABASE_URL") ?? getEnv("SUPABASE_URL") ?? null;
 }
 
 function getSupabaseAnonKey(): string | null {
-  return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? process.env.SUPABASE_ANON_KEY ?? null;
+  return getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY") ?? getEnv("SUPABASE_ANON_KEY") ?? null;
 }
 
 function getSupabaseServiceRoleKey(): string | null {
-  return process.env.SUPABASE_SERVICE_ROLE_KEY ?? null;
+  return getEnv("SUPABASE_SERVICE_ROLE_KEY") ?? null;
 }
 
 function getSupabaseAdminClient() {
@@ -55,7 +64,7 @@ export function canAccessRole(role: UserRole, allowedRoles: UserRole[]): boolean
   return allowedRoles.includes(role);
 }
 
-export async function readSessionFromRequest(request: NextRequest): Promise<AuthSession | null> {
+export async function readSessionFromRequest(request: RequestLike): Promise<AuthSession | null> {
   const cookieValue = request.cookies.get(SESSION_COOKIE)?.value;
 
   if (cookieValue) {

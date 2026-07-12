@@ -1,8 +1,8 @@
-import type { Expense } from "@/types/domain";
-import { forbidden, notFound, validationError } from "../errors";
+import type { Expense } from "../../frontend/types/domain";
+import { conflict, forbidden, notFound, validationError } from "../errors";
 import { repositories } from "../repositories";
 import { expenseCreateSchema } from "../validation";
-import type { UserRole } from "@/types/domain";
+import type { UserRole } from "../../frontend/types/domain";
 
 const writeRoles: UserRole[] = ["admin", "fleet_manager", "financial_analyst", "dispatcher"];
 

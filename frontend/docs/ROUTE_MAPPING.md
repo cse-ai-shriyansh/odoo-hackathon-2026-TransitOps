@@ -11,4 +11,4 @@
 | `/fuel-logs` | `GET /fuel`, `POST /fuel`, `PATCH /fuel/{id}`, `DELETE /fuel/{id}` |
 | `/expenses` | `GET /expenses`, `POST /expenses`, `PATCH /expenses/{id}`, `DELETE /expenses/{id}` |
 | `/reports` | `GET /reports` |
-| `/settings` | none yet; local-only UI state |
+| `/settings` | local-only UI preferences and role-based workspace configuration |

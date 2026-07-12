@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteMaintenanceService, updateMaintenanceService } from "@/backend/services/maintenance-service";
-import { successResponse } from "@/backend/response";
+import { deleteMaintenanceService, updateMaintenanceService } from "@backend/services/maintenance-service";
+import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {

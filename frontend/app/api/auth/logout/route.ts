@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { logoutService } from "@/backend/services/auth-service";
-import { successResponse } from "@/backend/response";
+import { logoutService } from "@backend/services/auth-service";
+import { successResponse } from "@backend/response";
 import { handleApiError } from "@/app/api/_utils";
-import { readSessionFromRequest } from "@/backend/auth";
+import { readSessionFromRequest } from "@backend/auth";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {

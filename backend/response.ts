@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from "../frontend/node_modules/next/server";
 import type { ApiEnvelope, ErrorEnvelope, SuccessEnvelope } from "./types";
 
-export function successResponse<TData>(data: TData, status = 200): NextResponse<ApiEnvelope<TData>> {
+export function successResponse<TData>(data: TData, status = 200): NextResponse {
   const body: SuccessEnvelope<TData> = { success: true, data };
   return NextResponse.json(body, { status });
 }
 
-export function errorResponse(message: string, status: number, errors?: Record<string, string>): NextResponse<ApiEnvelope<never>> {
+export function errorResponse(message: string, status: number, errors?: Record<string, string>): NextResponse {
   const body: ErrorEnvelope = { success: false, message, errors };
   return NextResponse.json(body, { status });
 }

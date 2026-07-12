@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { deleteDriverService, updateDriverService } from "@/backend/services/drivers-service";
-import { successResponse } from "@/backend/response";
+import { deleteDriverService, updateDriverService } from "@backend/services/drivers-service";
+import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }): Promise<NextResponse> {

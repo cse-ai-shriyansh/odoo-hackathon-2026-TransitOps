@@ -1,4 +1,4 @@
-import type { UserRole } from "@/types/domain";
+import type { UserRole } from "../frontend/types/domain";
 
 export const RESOURCE_ROLES: Record<string, UserRole[]> = {
   readAll: ["admin", "fleet_manager", "dispatcher", "safety_officer", "financial_analyst"],

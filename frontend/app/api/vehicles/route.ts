@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createVehicleService, listVehiclesService } from "@/backend/services/vehicles-service";
-import { successResponse } from "@/backend/response";
+import { createVehicleService, listVehiclesService } from "@backend/services/vehicles-service";
+import { successResponse } from "@backend/response";
 import { handleApiError, requireSession } from "@/app/api/_utils";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
