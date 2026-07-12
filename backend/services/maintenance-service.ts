@@ -20,7 +20,7 @@ export function listMaintenanceService(role: UserRole): MaintenanceRecord[] {
   return repositories.listMaintenance();
 }
 
-export function createMaintenanceService(role: UserRole, body: unknown): MaintenanceRecord {
+export async function createMaintenanceService(role: UserRole, body: unknown): Promise<MaintenanceRecord> {
   requireAllowed(role);
   const parsed = maintenanceCreateSchema.safeParse(body);
 
@@ -42,6 +42,13 @@ export function createMaintenanceService(role: UserRole, body: unknown): Mainten
 
   repositories.saveMaintenance([record, ...repositories.listMaintenance()]);
   repositories.saveVehicles(repositories.listVehicles().map((item) => (item.id === vehicle.id ? { ...item, status: "in_shop" } : item)));
+  try {
+    const { persistMaintenanceToSupabase } = await import("../repositories");
+    await persistMaintenanceToSupabase(record);
+  } catch (err) {
+    console.error("Maintenance persistence failed:", err);
+  }
+
   return record;
 }
 

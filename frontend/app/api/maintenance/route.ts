@@ -8,7 +8,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
     await initializeRepositoriesFromSupabase();
-    return successResponse(listMaintenanceService(session.user.role));
+    return successResponse(await listMaintenanceService(session.user.role));
   } catch (error) {
     return handleApiError(error);
   }
@@ -18,7 +18,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
     const body = await request.json();
-    return successResponse(createMaintenanceService(session.user.role, body), 201);
+    const result = await createMaintenanceService(session.user.role, body);
+    return successResponse(result, 201);
   } catch (error) {
     return handleApiError(error);
   }

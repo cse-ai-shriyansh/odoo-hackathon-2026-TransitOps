@@ -24,7 +24,7 @@ export function listDriversService(role: UserRole): Driver[] {
   return repositories.listDrivers();
 }
 
-export function createDriverService(role: UserRole, body: unknown): Driver {
+export async function createDriverService(role: UserRole, body: unknown): Promise<Driver> {
   requireAllowed(role);
   const parsed = driverCreateSchema.safeParse(body);
 
@@ -45,6 +45,14 @@ export function createDriverService(role: UserRole, body: unknown): Driver {
   };
 
   repositories.saveDrivers([record, ...repositories.listDrivers()]);
+
+  try {
+    const { persistDriverToSupabase } = await import("../repositories");
+    await persistDriverToSupabase(record);
+  } catch (err) {
+    console.error("Driver persistence failed:", err);
+  }
+
   return record;
 }
 

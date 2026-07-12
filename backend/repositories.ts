@@ -214,6 +214,113 @@ export async function persistVehicleToSupabase(vehicle: Vehicle, createdBy?: str
   await client.from("vehicles").insert(row);
 }
 
+export async function persistDriverToSupabase(driver: Driver, createdBy?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+
+  if (!client) return;
+
+  const profileId = createdBy ?? null;
+  const row = {
+    id: driver.id,
+    employee_code: `EMP-${driver.id.slice(-4)}`,
+    full_name: driver.name,
+    phone: driver.phone,
+    email: driver.email,
+    license_number: driver.licenseNumber,
+    license_expiry: driver.licenseExpiry.slice(0, 10),
+    status: driver.status === "suspended" ? "suspended" : "active",
+    created_by: profileId
+  };
+
+  await client.from("drivers").insert(row).throwOnError();
+}
+
+export async function persistTripToSupabase(trip: Trip, createdBy?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+
+  if (!client) return;
+
+  const row = {
+    id: trip.id,
+    trip_number: trip.reference,
+    vehicle_id: trip.vehicleId || null,
+    driver_id: trip.driverId || null,
+    dispatched_by: createdBy ?? null,
+    origin: trip.origin,
+    destination: trip.destination,
+    scheduled_departure: trip.plannedDeparture,
+    scheduled_arrival: trip.plannedArrival,
+    estimated_distance_km: trip.cargoWeightKg,
+    status: trip.status === "completed" ? "completed" : trip.status === "active" ? "dispatched" : "scheduled",
+    remarks: trip.notes
+  };
+
+  await client.from("trips").insert(row).throwOnError();
+}
+
+export async function persistMaintenanceToSupabase(record: MaintenanceRecord, createdBy?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    id: record.id,
+    vehicle_id: record.vehicleId,
+    maintenance_type: record.type,
+    description: record.notes,
+    maintenance_date: record.scheduledDate.slice(0, 10),
+    next_due_date: record.scheduledDate.slice(0, 10),
+    cost: record.cost,
+    service_provider: record.vendor,
+    status: record.status,
+    created_by: createdBy ?? null
+  };
+
+  await client.from("maintenance_logs").insert(row).throwOnError();
+}
+
+export async function persistFuelLogToSupabase(log: FuelLog, createdBy?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    id: log.id,
+    vehicle_id: log.vehicleId,
+    driver_id: log.driverId,
+    fuel_date: log.refuelDate,
+    fuel_station: log.station,
+    fuel_type: "diesel",
+    quantity_liters: log.liters,
+    price_per_liter: log.unitPrice,
+    odometer_reading_km: log.odometerKm,
+    total_cost: log.totalCost,
+    status: log.status,
+    created_by: createdBy ?? null
+  };
+
+  await client.from("fuel_logs").insert(row).throwOnError();
+}
+
+export async function persistExpenseToSupabase(expense: Expense, createdBy?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const row = {
+    id: expense.id,
+    expense_number: `EXP-${expense.id.slice(-6)}`,
+    vehicle_id: expense.vehicleId ?? null,
+    driver_id: null,
+    trip_id: expense.tripId ?? null,
+    created_by: createdBy ?? null,
+    expense_date: expense.date.slice(0, 10),
+    category: expense.category,
+    amount: expense.amount,
+    description: expense.description,
+    status: expense.status
+  };
+
+  await client.from("expenses").insert(row).throwOnError();
+}
+
 async function seedSupabaseFromMockData(client: NonNullable<ReturnType<typeof getSupabaseAdminClient>>) {
   const { data: existingProfiles } = await client.from("profiles").select("id").limit(1);
 

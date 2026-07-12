@@ -69,7 +69,7 @@ export function listTripsService(role: UserRole): Trip[] {
   return repositories.listTrips();
 }
 
-export function createTripService(role: UserRole, body: unknown): Trip {
+export async function createTripService(role: UserRole, body: unknown): Promise<Trip> {
   requireAllowed(role);
   const parsed = tripCreateSchema.safeParse(body);
 
@@ -85,6 +85,14 @@ export function createTripService(role: UserRole, body: unknown): Trip {
   };
 
   repositories.saveTrips([record, ...repositories.listTrips()]);
+
+  try {
+    const { persistTripToSupabase } = await import("../repositories");
+    await persistTripToSupabase(record);
+  } catch (err) {
+    console.error("Trip persistence failed:", err);
+  }
+
   return record;
 }
 

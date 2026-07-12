@@ -20,7 +20,7 @@ export function listExpensesService(role: UserRole): Expense[] {
   return repositories.listExpenses();
 }
 
-export function createExpenseService(role: UserRole, body: unknown): Expense {
+export async function createExpenseService(role: UserRole, body: unknown): Promise<Expense> {
   requireAllowed(role);
   const parsed = expenseCreateSchema.safeParse(body);
 
@@ -36,6 +36,13 @@ export function createExpenseService(role: UserRole, body: unknown): Expense {
   };
 
   repositories.saveExpenses([record, ...repositories.listExpenses()]);
+  try {
+    const { persistExpenseToSupabase } = await import("../repositories");
+    await persistExpenseToSupabase(record);
+  } catch (err) {
+    console.error("Expense persistence failed:", err);
+  }
+
   return record;
 }
 

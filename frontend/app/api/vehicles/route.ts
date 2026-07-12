@@ -8,7 +8,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
     await initializeRepositoriesFromSupabase();
-    return successResponse(listVehiclesService(session.user.role));
+    return successResponse(await listVehiclesService(session.user.role));
   } catch (error) {
     return handleApiError(error);
   }

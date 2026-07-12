@@ -20,7 +20,7 @@ export function listFuelLogsService(role: UserRole): FuelLog[] {
   return repositories.listFuelLogs();
 }
 
-export function createFuelLogService(role: UserRole, body: unknown): FuelLog {
+export async function createFuelLogService(role: UserRole, body: unknown): Promise<FuelLog> {
   requireAllowed(role);
   const parsed = fuelCreateSchema.safeParse(body);
 
@@ -39,5 +39,12 @@ export function createFuelLogService(role: UserRole, body: unknown): FuelLog {
   }
 
   repositories.saveFuelLogs([record, ...repositories.listFuelLogs()]);
+  try {
+    const { persistFuelLogToSupabase } = await import("../repositories");
+    await persistFuelLogToSupabase(record);
+  } catch (err) {
+    console.error("Fuel log persistence failed:", err);
+  }
+
   return record;
 }

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
     await initializeRepositoriesFromSupabase();
-    return successResponse(listExpensesService(session.user.role));
+    return successResponse(await listExpensesService(session.user.role));
   } catch (error) {
     return handleApiError(error);
   }
@@ -18,7 +18,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await requireSession(request);
     const body = await request.json();
-    return successResponse(createExpenseService(session.user.role, body), 201);
+    const result = await createExpenseService(session.user.role, body);
+    return successResponse(result, 201);
   } catch (error) {
     return handleApiError(error);
   }
