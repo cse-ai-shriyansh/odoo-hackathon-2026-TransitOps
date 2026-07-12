@@ -1,6 +1,6 @@
 import type { Vehicle } from "../../frontend/types/domain";
 import { conflict, forbidden, notFound, validationError } from "../errors";
-import { persistVehicleToSupabase, repositories } from "../repositories";
+import { persistVehicleToSupabase, updateVehicleInSupabase, deleteVehicleFromSupabase, repositories } from "../repositories";
 import { vehicleCreateSchema } from "../validation";
 import type { UserRole } from "../../frontend/types/domain";
 
@@ -53,7 +53,7 @@ export async function createVehicleService(role: UserRole, body: unknown): Promi
   return record;
 }
 
-export function updateVehicleService(role: UserRole, id: string, body: unknown): Vehicle {
+export async function updateVehicleService(role: UserRole, id: string, body: unknown): Promise<Vehicle> {
   requireAllowed(role);
   const parsed = vehicleCreateSchema.partial().safeParse(body);
 
@@ -76,10 +76,16 @@ export function updateVehicleService(role: UserRole, id: string, body: unknown):
   ensureUniquePlate(updated.plateNumber, id);
   records[index] = updated;
   repositories.saveVehicles(records);
+  try {
+    await updateVehicleInSupabase(updated, records[index].plateNumber);
+  } catch (err) {
+    console.error("Failed to update vehicle in Supabase", err);
+  }
+
   return updated;
 }
 
-export function deleteVehicleService(role: UserRole, id: string): { success: true } {
+export async function deleteVehicleService(role: UserRole, id: string): Promise<{ success: true }> {
   if (role !== "admin") {
     throw forbidden("Insufficient permissions");
   }
@@ -91,13 +97,21 @@ export function deleteVehicleService(role: UserRole, id: string): { success: tru
     throw conflict("Vehicle is assigned to an active trip.");
   }
 
-  const nextVehicles = vehicles.filter((vehicle) => vehicle.id !== id);
+  const vehicle = vehicles.find((v) => v.id === id);
 
-  if (nextVehicles.length === vehicles.length) {
+  if (!vehicle) {
     throw notFound("Vehicle not found.");
   }
 
+  const nextVehicles = vehicles.filter((v) => v.id !== id);
   repositories.saveVehicles(nextVehicles);
+
+  try {
+    await deleteVehicleFromSupabase(vehicle.plateNumber);
+  } catch (err) {
+    console.error("Failed to delete vehicle from Supabase", err);
+  }
+
   return { success: true };
 }
 

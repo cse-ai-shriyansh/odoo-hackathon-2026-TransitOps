@@ -242,7 +242,7 @@ export default function VehiclesPage(): JSX.Element {
             </div>
             <DialogFooter>
               <Button variant="outline" type="button" onClick={() => { setEditing(null); setIsDialogOpen(false); }}>Cancel</Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit" disabled={mutation.isLoading}>{mutation.isLoading ? "Saving..." : "Save"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

@@ -214,6 +214,31 @@ export async function persistVehicleToSupabase(vehicle: Vehicle, createdBy?: str
   await client.from("vehicles").insert(row);
 }
 
+export async function updateVehicleInSupabase(vehicle: Vehicle, oldPlate?: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  const identifierPlate = oldPlate ?? vehicle.plateNumber;
+
+  const row = {
+    registration_number: vehicle.plateNumber,
+    make: vehicle.name.split(" ")[0] || "TransitOps",
+    model: vehicle.name.split(" ").slice(1).join(" ") || "Fleet",
+    vehicle_type: toDbVehicleType(vehicle.type),
+    capacity_kg: vehicle.capacityKg,
+    status: toDbVehicleStatus(vehicle.status)
+  };
+
+  await client.from("vehicles").update(row).eq("registration_number", identifierPlate).throwOnError();
+}
+
+export async function deleteVehicleFromSupabase(plateNumber: string): Promise<void> {
+  const client = getSupabaseAdminClient();
+  if (!client) return;
+
+  await client.from("vehicles").delete().eq("registration_number", plateNumber).throwOnError();
+}
+
 export async function persistDriverToSupabase(driver: Driver, createdBy?: string): Promise<void> {
   const client = getSupabaseAdminClient();
 
